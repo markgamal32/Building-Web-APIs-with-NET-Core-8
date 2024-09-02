@@ -78,7 +78,7 @@ namespace linkedin_Learning_Dot_Net_8.Controllers
 		[HttpPost]
 		public async Task<ActionResult<Product>> AddProduct([FromBody] Product newProduct)
 		{
-			// Combine validation checks in one line
+			//  validation checks 
 			if (newProduct == null ||
 				string.IsNullOrWhiteSpace(newProduct.Name) ||
 				newProduct.Price <= 0 || newProduct.Id <= 0)
@@ -103,7 +103,6 @@ namespace linkedin_Learning_Dot_Net_8.Controllers
 					return BadRequest("Product ID must be a positive integer.");
 				}
 			}
-
 			try
 			{
 				// Add the new product to the database
@@ -127,6 +126,71 @@ namespace linkedin_Learning_Dot_Net_8.Controllers
 			}
 		}
 
+
+		[HttpPut("{id}")]
+		public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product updatedProduct)
+		{
+			//  validation checks 
+			if (updatedProduct == null ||
+				string.IsNullOrWhiteSpace(updatedProduct.Name) ||
+				updatedProduct.Price <= 0 || updatedProduct.Id != id)
+			{
+				// Determine which specific validation failed and return an appropriate response
+				if (updatedProduct == null)
+				{
+					return BadRequest("Product data is required.");
+				}
+
+				if (string.IsNullOrWhiteSpace(updatedProduct.Name))
+				{
+					return BadRequest("Product name is required.");
+				}
+
+				if (updatedProduct.Price <= 0)
+				{
+					return BadRequest("Product price must be greater than zero.");
+				}
+
+				if (updatedProduct.Id != id)
+				{
+					return BadRequest("Product ID in the body does not match the URL.");
+				}
+			}
+
+			try
+			{
+				var existingProduct = await _shopContext.Products.FindAsync(id);
+
+				if (existingProduct == null)
+				{
+					return NotFound("Product not found.");
+				}
+
+				// Update the existing product's properties
+				existingProduct.Name = updatedProduct.Name;
+				existingProduct.Price = updatedProduct.Price;
+				existingProduct.Sku = updatedProduct.Sku;
+				existingProduct.Description = updatedProduct.Description;
+				existingProduct.IsAvailable = updatedProduct.IsAvailable;
+				existingProduct.CategoryId = updatedProduct.CategoryId;
+
+				await _shopContext.SaveChangesAsync();
+
+				return NoContent(); // Return 204 No Content for a successful update with no response body
+			}
+			catch (DbUpdateException dbEx)
+			{
+				// Log database-specific errors
+				_logger.LogError(dbEx, "A database error occurred while updating the product.");
+				return StatusCode(500, "A database error occurred.");
+			}
+			catch (Exception ex)
+			{
+				// Log general errors
+				_logger.LogError(ex, "An error occurred while updating the product.");
+				return StatusCode(500, "Internal server error");
+			}
+		}
 
 
 
