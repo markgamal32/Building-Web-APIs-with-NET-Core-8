@@ -230,5 +230,48 @@ namespace linkedin_Learning_Dot_Net_8.Controllers
 			}
 		}
 
+
+		//Deleting several Products
+		[HttpDelete("batch")]
+		public async Task<IActionResult> DeleteProducts([FromBody] List<int> productIds)
+		{
+			if (productIds == null || !productIds.Any())
+			{
+				return BadRequest("A list of product IDs is required.");
+			}
+
+			try
+			{
+				// Fetch the products that match the provided IDs
+				var products = await _shopContext.Products
+					.Where(p => productIds.Contains(p.Id))
+					.ToListAsync();
+
+				if (products.Count == 0)
+				{
+					return NotFound("No matching products found.");
+				}
+
+				// Remove the products from the database
+				_shopContext.Products.RemoveRange(products);
+				await _shopContext.SaveChangesAsync();
+
+				return NoContent(); // Return 204 No Content for a successful deletion with no response body
+			}
+			catch (DbUpdateException dbEx)
+			{
+				// Log database-specific errors
+				_logger.LogError(dbEx, "A database error occurred while deleting the products.");
+				return StatusCode(500, "A database error occurred.");
+			}
+			catch (Exception ex)
+			{
+				// Log general errors
+				_logger.LogError(ex, "An error occurred while deleting the products.");
+				return StatusCode(500, "Internal server error");
+			}
+		}
+
+
 	}
 }

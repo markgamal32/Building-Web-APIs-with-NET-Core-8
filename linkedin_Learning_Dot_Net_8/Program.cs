@@ -31,4 +31,16 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+
+
+using (var scope = app.Services.CreateScope())
+{
+	var db = scope.ServiceProvider.GetRequiredService<ShopContext>();
+	await db.Database.EnsureCreatedAsync();
+}
+// getting the available products using Minimal API
+app.MapGet("/products/available", async (ShopContext _context) =>
+	Results.Ok(await _context.Products.Where(p => p.IsAvailable).ToArrayAsync())
+);
+
 app.Run();
