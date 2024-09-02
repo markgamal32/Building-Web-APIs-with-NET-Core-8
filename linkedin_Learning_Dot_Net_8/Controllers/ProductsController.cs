@@ -46,7 +46,36 @@ namespace linkedin_Learning_Dot_Net_8.Controllers
 			}
 		}
 
-	
+
+		[HttpGet("{id:int}")]
+		public async Task<ActionResult<Product>> GetProductById(int id)
+		{
+			try
+			{
+				var product = await _shopContext.Products.FindAsync(id);
+
+				if (id <= 0 || product == null)
+				{
+					return id <= 0
+						? BadRequest("Invalid ID. ID must be a positive integer.")
+						: NotFound($"Product with ID {id} not found.");
+				}
+
+				return Ok(product);
+			}
+			catch (DbUpdateException dbEx)
+			{
+				_logger.LogError(dbEx, $"A database error occurred while retrieving product with ID {id}.");
+				return StatusCode(500, "A database error occurred.");
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, $"An error occurred while retrieving product with ID {id}.");
+				return StatusCode(500, "Internal server error");
+			}
+		}
+
+
 
 
 	}
