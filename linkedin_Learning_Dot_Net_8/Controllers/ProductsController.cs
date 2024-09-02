@@ -272,6 +272,29 @@ namespace linkedin_Learning_Dot_Net_8.Controllers
 			}
 		}
 
+		// another way for Deleting several Products
+		[HttpPost("Delete")]
+		public async Task<ActionResult> DeleteMultiple([FromQuery] int[] ids)
+		{
+			var products = new List<Product>();
+			foreach (var id in ids)
+			{
+				var product = await _shopContext.Products.FindAsync(id);
+
+				if (product == null)
+				{
+					return NotFound();
+				}
+
+				products.Add(product);
+			}
+
+			_shopContext.Products.RemoveRange(products);
+			await _shopContext.SaveChangesAsync();
+
+			return Ok(products);
+		}
+
 
 	}
 }
