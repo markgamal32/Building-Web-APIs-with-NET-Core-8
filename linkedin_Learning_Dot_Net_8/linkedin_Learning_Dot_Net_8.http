@@ -1,0 +1,6 @@
+@linkedin_Learning_Dot_Net_8_HostAddress = http://localhost:5239
+
+GET {{linkedin_Learning_Dot_Net_8_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
