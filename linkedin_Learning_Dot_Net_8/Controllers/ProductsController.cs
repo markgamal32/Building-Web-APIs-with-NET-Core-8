@@ -28,6 +28,10 @@ namespace linkedin_Learning_Dot_Net_8.Controllers
 		/* Uses asynchronous programming for better performance.
 		   Includes basic error handling.
 		   Returns an ActionResult, providing more flexibility in the HTTP response.*/
+
+
+
+
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
 		{
@@ -194,6 +198,37 @@ namespace linkedin_Learning_Dot_Net_8.Controllers
 
 
 
+		[HttpDelete("{id}")]
+		public async Task<IActionResult> DeleteProduct(int id)
+		{
+			try
+			{
+				var product = await _shopContext.Products.FindAsync(id);
+
+				if (product == null)
+				{
+					return NotFound("Product not found.");
+				}
+
+				// Remove the product from the database
+				_shopContext.Products.Remove(product);
+				await _shopContext.SaveChangesAsync();
+
+				return Ok(product); // Return 200 OK for a Successful deletion with the Deleted Product
+			}
+			catch (DbUpdateException dbEx)
+			{
+				// Log database-specific errors
+				_logger.LogError(dbEx, "A database error occurred while deleting the product.");
+				return StatusCode(500, "A database error occurred.");
+			}
+			catch (Exception ex)
+			{
+				// Log general errors
+				_logger.LogError(ex, "An error occurred while deleting the product.");
+				return StatusCode(500, "Internal server error");
+			}
+		}
 
 	}
 }
