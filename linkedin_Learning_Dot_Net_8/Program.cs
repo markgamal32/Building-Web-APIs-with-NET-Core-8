@@ -10,6 +10,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+/*    Configures the ShopContext to use an in-memory database named "shop"
+	  for dependency injection. This setup is typically used for testing purposes
+	  or for running the application without a persistent database. 
+*/
 builder.Services.AddDbContext<ShopContext>(options => { options.UseInMemoryDatabase("shop"); });
 
 var app = builder.Build();
