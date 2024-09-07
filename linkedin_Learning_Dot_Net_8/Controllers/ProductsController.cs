@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace linkedin_Learning_Dot_Net_8.Controllers
 {
@@ -30,17 +31,59 @@ namespace linkedin_Learning_Dot_Net_8.Controllers
 		   Returns an ActionResult, providing more flexibility in the HTTP response.*/
 
 
+		// another way of pagination using PaginatedResponse<T> model
+		//[HttpGet]
+		//public async Task<ActionResult> Get_All_Products([FromQuery] QueryParameters queryParameters)
+		//{
+		//	try
+		//	{
+		//		IQueryable<Product> products = _shopContext.Products;
+
+		//		// Calculate total records before pagination
+		//		var totalRecords = await products.CountAsync();
+
+		//		// Apply pagination: Skip (Page - 1) * Size items and Take Size items
+		//		products = products.Skip((queryParameters.Page - 1) * queryParameters.Size)
+		//						   .Take(queryParameters.Size);
+
+		//		var productList = await products.ToListAsync();
+
+		//		// Return a paginated response along with meta-data
+		//		var response = new PaginatedResponse<Product>
+		//		{
+		//			Data = productList,
+		//			PageNumber = queryParameters.Page,
+		//			PageSize = queryParameters.Size,
+		//			TotalRecords = totalRecords,
+		//			TotalPages = (int)Math.Ceiling((double)totalRecords / queryParameters.Size)
+		//		};
+
+		//		return Ok(response);
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		// Log exception and return 500
+		//		_logger.LogError(ex, "An error occurred while retrieving products.");
+		//		return StatusCode(500, "Internal server error");
+		//	}
+		//}
 
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
+		public async Task<ActionResult> GetAllProducts([FromQuery] QueryParameters queryParameters)
 		{
 			try
-			{
-		    /* This approach is more efficient, especially in I/O-bound operations like database calls,
+			{  
+				IQueryable<Product> products = _shopContext.Products;
+
+				products = products.Skip(queryParameters.Size * queryParameters.Page -1)
+					.Take(queryParameters.Size);
+
+
+			/* This approach is more efficient, especially in I/O-bound operations like database calls,
 		      as it frees up the thread to handle other requests while waiting for the data to be fetched. */
-				var products = await _shopContext.Products.ToListAsync();
-				return Ok(products);
+				
+				return Ok(await products.ToListAsync());
 			}
 			catch (Exception ex)
 			{
