@@ -70,13 +70,24 @@ namespace linkedin_Learning_Dot_Net_8.Controllers
 
 
 		[HttpGet]
-		public async Task<ActionResult> GetAllProducts([FromQuery] QueryParameters queryParameters)
+		public async Task<ActionResult> GetAllProducts([FromQuery] ProductQueryParameters queryParameters)
 		{
 			try
 			{  
 				IQueryable<Product> products = _shopContext.Products;
+                if (queryParameters.MinPrice != null)
+                {
+					products = products.Where(p=>p.Price >= queryParameters.MinPrice.Value);
 
-				products = products.Skip(queryParameters.Size * queryParameters.Page -1)
+				}
+                if (queryParameters.MaxPrice !=null)
+                {
+					products = products.Where(p => p.Price <= queryParameters.MaxPrice.Value);
+
+				}
+
+
+                products = products.Skip(queryParameters.Size * (queryParameters.Page -1))
 					.Take(queryParameters.Size);
 
 
