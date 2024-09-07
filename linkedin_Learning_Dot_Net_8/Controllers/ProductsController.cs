@@ -85,9 +85,17 @@ namespace linkedin_Learning_Dot_Net_8.Controllers
 					products = products.Where(p => p.Price <= queryParameters.MaxPrice.Value);
 
 				}
+                if (!string.IsNullOrEmpty(queryParameters.Sku))
+                {
+					products= products.Where(p=>p.Sku.ToLower().Contains(queryParameters.Sku.ToLower()));
 
+				}
+				if (!string.IsNullOrEmpty(queryParameters.Name))
+				{
+					products = products.Where(p => p.Name.ToLower() == queryParameters.Name.ToLower());
+				}
 
-                products = products.Skip(queryParameters.Size * (queryParameters.Page -1))
+				products = products.Skip(queryParameters.Size * (queryParameters.Page -1))
 					.Take(queryParameters.Size);
 
 
