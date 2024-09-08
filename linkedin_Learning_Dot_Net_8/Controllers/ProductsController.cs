@@ -95,6 +95,16 @@ namespace linkedin_Learning_Dot_Net_8.Controllers
 					products = products.Where(p => p.Name.ToLower() == queryParameters.Name.ToLower());
 				}
 
+				if (!string.IsNullOrEmpty(queryParameters.SortBy))
+				{
+					if (typeof(Product).GetProperty(queryParameters.SortBy) != null)
+					{
+						products = products.OrderByCustom(
+							queryParameters.SortBy,
+							queryParameters.SortOrder);
+					}
+				}
+
 				products = products.Skip(queryParameters.Size * (queryParameters.Page -1))
 					.Take(queryParameters.Size);
 
