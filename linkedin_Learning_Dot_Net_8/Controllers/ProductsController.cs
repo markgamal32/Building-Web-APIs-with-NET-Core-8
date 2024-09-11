@@ -1,4 +1,5 @@
-﻿using linkedin_Learning_Dot_Net_8.Models;
+﻿using Asp.Versioning;
+using linkedin_Learning_Dot_Net_8.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,13 +7,14 @@ using System.Linq;
 
 namespace linkedin_Learning_Dot_Net_8.Controllers
 {
-	[Route("api/[controller]")]
+	[ApiVersion("1.0")]
+	[Route("api/v{version:apiVersion}/products")]
 	[ApiController]
-	public class ProductsController : ControllerBase
+	public class ProductsV1Controller : ControllerBase
 	{
 		private readonly ShopContext _shopContext;
-		private readonly ILogger<ProductsController> _logger;
-        public ProductsController(ShopContext shopContext,ILogger<ProductsController> logger)
+		private readonly ILogger<ProductsV1Controller> _logger;
+        public ProductsV1Controller(ShopContext shopContext,ILogger<ProductsV1Controller> logger)
         {
 			_shopContext = shopContext;
 			_logger= logger;
